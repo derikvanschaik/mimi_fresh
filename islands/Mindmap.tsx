@@ -17,10 +17,16 @@ export default function Mindmap(props: any) {
 
   const TBOXES = [
     { x: 600, y: 300, text: 'hello world'},
-    { x: 230, y: 89, text: 'Again hello!'}
+    { x: 230, y: 89, text: 'Again hello!'},
+    {x: 100, y: 100, text: 'hey there babyyy'},
+    { x: 400, y: 400, text: 'new link'},
+    { x: 800, y: 700, text: 'yes baby we love new links!'}
   ]
   const LINES = [
-    { from: {x: 600, y: 300}, to: {x: 230, y: 89}}
+    { from: {x: 600, y: 300}, to: {x: 230, y: 89}},
+    { from: {x: 100, y: 100}, to: {x: 230, y:89 }},
+    {from:{x: 400, y: 400}, to:{ x: 800, y: 700}},
+    {from:{x: 230, y: 89}, to:{ x: 800, y: 700}},
   ]
 
   const [textboxes, setTextboxes] = useState<TextBox[]>(TBOXES)
@@ -87,25 +93,19 @@ export default function Mindmap(props: any) {
   }
   // update when box pos changes 
   const updateLines = (oldX: number, oldY: number, newX: number, newY: number) =>{
+    const newLines = [];
     for(let i = 0; i < lines.length; i++){
       const {from, to} = lines[i];
-
+      let newLine = {from, to};
       if ( from.x === oldX && from.y === oldY){
-        setLines([...lines.slice(0, i), 
-          {from: {x: newX, y: newY}, to: lines[i].to },
-          ...lines.slice(i + 1, lines.length)
-        ]);
-        break;
+        newLine = {from: {x: newX, y: newY}, to: lines[i].to }
       }
-      if( to.x === oldX && to.y === oldY){
-        setLines([...lines.slice(0, i), 
-          {from: lines[i].from , to: {x: newX, y: newY} },
-          ...lines.slice(i + 1, lines.length)
-        ]);
-        break;
-
+      else if( to.x === oldX && to.y === oldY){
+        newLine = {from: lines[i].from , to: {x: newX, y: newY} }
       }
+      newLines.push(newLine);
     }
+    setLines(newLines);
   }
 
   return (
