@@ -19,8 +19,12 @@ export default function Mindmap(props: any) {
     { x: 600, y: 300, text: 'hello world'},
     { x: 230, y: 89, text: 'Again hello!'}
   ]
+  const LINES = [
+    { from: {x: 600, y: 300}, to: {x: 230, y: 89}}
+  ]
 
   const [textboxes, setTextboxes] = useState<TextBox[]>(TBOXES)
+  const [lines, setLines ] = useState(LINES);
 
   const canvasRef = useRef(null);
 
@@ -42,6 +46,7 @@ export default function Mindmap(props: any) {
         y: textboxes[tIdx].y + (e.clientY - pos.y),
         text: textboxes[tIdx].text,
       }
+      updateLines(textboxes[tIdx].x, textboxes[tIdx].y, newTbox.x, newTbox.y);
       setTextboxes([
         ...textboxes.slice(0, tIdx),
         newTbox,
@@ -63,6 +68,45 @@ export default function Mindmap(props: any) {
       document.removeEventListener("mousemove", handleMousemove);
     }
   }, [textboxes, tIdx])
+
+  useEffect(()=>{
+    drawLines();
+  }, [lines, h, w]);
+
+  const drawLines = () =>{
+    const ctx = canvasRef.current.getContext("2d");
+    // erase prev lines 
+    ctx.clearRect(0, 0, w, h);
+
+    for(const { from, to } of lines){
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
+      ctx.stroke();
+    }
+  }
+  // update when box pos changes 
+  const updateLines = (oldX: number, oldY: number, newX: number, newY: number) =>{
+    for(let i = 0; i < lines.length; i++){
+      const {from, to} = lines[i];
+
+      if ( from.x === oldX && from.y === oldY){
+        setLines([...lines.slice(0, i), 
+          {from: {x: newX, y: newY}, to: lines[i].to },
+          ...lines.slice(i + 1, lines.length)
+        ]);
+        break;
+      }
+      if( to.x === oldX && to.y === oldY){
+        setLines([...lines.slice(0, i), 
+          {from: lines[i].from , to: {x: newX, y: newY} },
+          ...lines.slice(i + 1, lines.length)
+        ]);
+        break;
+
+      }
+    }
+  }
 
   return (
     <div>
