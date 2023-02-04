@@ -1,15 +1,17 @@
 import { useState, useEffect } from "preact/hooks";
+import EditText from "../components/EditText.tsx";
 import More from '../components/More.tsx';
 
 interface TextboxProps{
     x: number,
     y: number,
     text: string,
-    handleMousedown: () => void;
-    handleMouseup: () => void;
-    handleDelete: () => void;
+    handleMousedown: () => void,
+    handleMouseup: () => void,
+    handleDelete: () => void,
+    handleEdit: (value: string) => void,
 }
-export default function Textbox({x, y, text, handleMousedown, handleMouseup, handleDelete}: TextboxProps) {
+export default function Textbox({x, y, text, handleMousedown, handleMouseup, handleDelete, handleEdit}: TextboxProps) {
   const [hover, setHover] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -20,9 +22,17 @@ export default function Textbox({x, y, text, handleMousedown, handleMouseup, han
         onMouseup={handleMouseup}
         onMouseenter={() => setHover(true)}
         onMouseleave={() => setHover(false)}
-        className={`scale-110 fixed top-[${y}px] left-[${x}px] border-2 border-grey-500 shadow-md rounded-lg px-4 py-3 select-none transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-125 cursor-move bg-white`}>
-    {text}
-
+        className={`max-w-[250px] scale-110 fixed top-[${y}px] left-[${x}px] border-2 border-grey-500 shadow-md rounded-lg px-4 py-3 select-none transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-125 cursor-move bg-white`}>
+      { editing && 
+          <EditText 
+            value={text} 
+            handleSubmit={(val: string) => {
+              setEditing(false);
+              handleEdit(val);
+            }}
+            handleCancel={() => setEditing(false)}/> 
+      }
+      { !editing && text} 
     {/* More action menu icon */}
     <div
       onClick={() => setOpen(!open)}
@@ -39,7 +49,11 @@ export default function Textbox({x, y, text, handleMousedown, handleMouseup, han
               Delete
             </p>
           </li>
-          <li>
+          <li onClick={() => {
+            setEditing(true);
+            setOpen(false);
+            
+          }}>
             <p 
               class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" >
               Edit

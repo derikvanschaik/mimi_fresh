@@ -115,6 +115,15 @@ export default function Mindmap(props: any) {
     setTextboxes(textboxes.filter((_, idx: number): boolean => idx !== i ));
   }
 
+  const editTextbox = (i: number, text: string) => {
+
+    setTextboxes(
+      [...textboxes.slice(0, i),
+        { ...textboxes[i], text},
+      ...textboxes.slice(i+1, textboxes.length)
+      ]);
+  }
+
   return (
     <div>
       <canvas height={h} width={w} ref={canvasRef}>
@@ -129,7 +138,8 @@ export default function Mindmap(props: any) {
               text={t.text} 
               handleMousedown={() => setTidx(i)}
               handleMouseup={() => setTidx(null) }
-              handleDelete={() => deleteTextbox(i)}/>
+              handleDelete={() => deleteTextbox(i)}
+              handleEdit = {(val: string) => editTextbox(i, val)}/>
           )
         })
       }
