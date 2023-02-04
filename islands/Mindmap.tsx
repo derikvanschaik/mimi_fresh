@@ -125,7 +125,12 @@ export default function Mindmap(props: any) {
 
         })
       }
-
+    {/* menu buttons */}
+    <button
+      onClick={() => {setTextboxes([...textboxes, {x : 500, y: 500, text: 'NEW TEXTBOX'}])}}
+      class="scale-115 fixed bottom-2 left-2 inline-block px-6 py-2 border-2 border-green-500 bg-green-500 text-white font-medium text-lg leading-tight uppercase rounded-full hover:bg-black hover:text-black hover:bg-opacity-5 focus:outline-none focus:ring-0 transition duration-150 ease-in-out">
+      Add 
+    </button>
     </div>
   );
 }
