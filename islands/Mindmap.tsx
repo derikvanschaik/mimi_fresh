@@ -16,11 +16,11 @@ export default function Mindmap(props: any) {
   const [pos, setPos] = useState({ x: 0, y: 0});
 
   const TBOXES = [
-    { x: 600, y: 300, text: 'hello world'},
-    { x: 230, y: 89, text: 'Again hello!'},
-    {x: 100, y: 100, text: 'hey there babyyy'},
-    { x: 400, y: 400, text: 'new link'},
-    { x: 800, y: 700, text: 'yes baby we love new links!'}
+    { x: 600, y: 300, text: 'hello world', id: "90192"},
+    { x: 230, y: 89, text: 'Again hello!', id: "9102390"},
+    {x: 100, y: 100, text: 'hey there babyyy', id: "77"},
+    { x: 400, y: 400, text: 'new link', id: "78979"},
+    { x: 800, y: 700, text: 'yes baby we love new links!', id: "87"}
   ]
   const LINES = [
     { from: {x: 600, y: 300}, to: {x: 230, y: 89}},
@@ -107,6 +107,13 @@ export default function Mindmap(props: any) {
     }
     setLines(newLines);
   }
+  const deleteTextbox = (i: number) =>{
+    const { x, y } = textboxes[i];
+    setLines(lines.filter( line =>{
+      return ( line.from.x !== x && line.from.y !== y ) && (line.to.x !== x && line.to.y !== y);
+    }));
+    setTextboxes(textboxes.filter((_, idx: number): boolean => idx !== i ));
+  }
 
   return (
     <div>
@@ -116,13 +123,14 @@ export default function Mindmap(props: any) {
         textboxes.map( (t, i) =>{
           return (
             <Textbox
+              key={t.id}
               x={t.x} 
               y={t.y} 
               text={t.text} 
               handleMousedown={() => setTidx(i)}
-              handleMouseup={() => setTidx(null)}/>
+              handleMouseup={() => setTidx(null) }
+              handleDelete={() => deleteTextbox(i)}/>
           )
-
         })
       }
     {/* menu buttons */}
