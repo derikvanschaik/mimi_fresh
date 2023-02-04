@@ -6,12 +6,16 @@ interface TextboxProps{
     x: number,
     y: number,
     text: string,
+    selected: boolean,
     handleMousedown: () => void,
     handleMouseup: () => void,
     handleDelete: () => void,
     handleEdit: (value: string) => void,
+    handleSelect: () => void;
 }
-export default function Textbox({x, y, text, handleMousedown, handleMouseup, handleDelete, handleEdit}: TextboxProps) {
+export default function Textbox(
+  {x, y, text, selected, handleMousedown, handleMouseup, handleDelete, handleEdit, handleSelect}: TextboxProps) 
+  {
   const [hover, setHover] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -22,7 +26,7 @@ export default function Textbox({x, y, text, handleMousedown, handleMouseup, han
         onMouseup={handleMouseup}
         onMouseenter={() => setHover(true)}
         onMouseleave={() => setHover(false)}
-        className={`max-w-[250px] scale-110 fixed top-[${y}px] left-[${x}px] border-2 border-grey-500 shadow-md rounded-lg px-4 py-3 select-none transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-125 cursor-move bg-white`}>
+        className={`fixed top-[${y}px] left-[${x}px] border-${selected? '4' : '2'} border-${selected? 'indigo': 'grey'}-500 max-w-[250px] scale-110 shadow-md rounded-lg px-4 py-3 select-none transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-125 cursor-move bg-white`}>
       { editing && 
           <EditText 
             value={text} 
@@ -59,10 +63,13 @@ export default function Textbox({x, y, text, handleMousedown, handleMouseup, han
               Edit
             </p>
           </li>
-          <li>
+          <li onClick={() =>{
+            handleSelect();
+            setOpen(false);
+          }}>
             <p 
               class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" >
-              Connect 
+              Toggle Select
             </p>
           </li>
         </ul>
