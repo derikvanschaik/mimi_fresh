@@ -9,9 +9,7 @@ export const handler : Handler = {
       const [mindmapData] = mindmapRows;
       const parsedMindmap = JSON.parse(mindmapData.mindmap_data);
       const { lines, textboxes } = parsedMindmap;
-      return ctx.render({lines, textboxes, callback: function(){
-        console.log("hello wrold!")
-      }})
+      return ctx.render({lines, textboxes})
       
     }catch(err){
       console.log("there was an error initializing this mindmap data.")
@@ -59,7 +57,6 @@ export default function Mindmap(props: PageProps) {
   <div>
     <MindmapIsland
       mindmapID={props.params.mindmap}
-      handleSave={props.data.callback}
       lines={props.data.lines} 
       textboxes={props.data.textboxes} />
   </div>
