@@ -1,6 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
 import { getMindmaps } from './api/dbService.ts'
 import MindmapLinkCard from '../components/MindmapLinkCard.tsx'
+import TutorialVideo from '../islands/TutorialVideo.tsx';
 
 export const handler : Handler = {
   async GET(_, ctx){
@@ -47,8 +48,9 @@ export default function Home({data}) {
 
           <div class='bg-red-50 py-6'>
             <h1 class='font-bold text-black text-4xl text-center my-3 '>GET STARTED</h1>
-            <p class='text-center text-2xl font-bold w-1/2 mx-auto mb-2'>
-              Click on any of the mindmaps below to start mindmapping
+            <p class='text-center text-lg w-1/2 mx-auto mb-2'>
+              Click any of these mindmaps below to start
+              or watch a short demo: <TutorialVideo />
             </p>
             {/*  */}
             <div class="w-4/5 md:w-1/2 my-0 mx-auto">
