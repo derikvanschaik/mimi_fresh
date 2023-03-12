@@ -8,11 +8,6 @@ interface TextBox {
   y: number, 
   text: string
 }
-// interface MindmapProps{
-//   lines: any;
-//   textboxes: any;
-//   handleSave: (data: string) => void;
-// }
 
 export default function MindmapIsland(props : any) {
 
