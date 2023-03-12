@@ -2,25 +2,29 @@ import { useState, useEffect, useRef } from "preact/hooks";
 import Close from "../components/Close.tsx";
 import Textbox from '../islands/Textbox.tsx';
 
+
 interface TextBox {
   x: number, 
   y: number, 
   text: string
 }
+// interface MindmapProps{
+//   lines: any;
+//   textboxes: any;
+//   handleSave: (data: string) => void;
+// }
 
+export default function MindmapIsland(props : any) {
 
-export default function Mindmap(props : any) {
   const [h, setH] = useState(0);
   const [w, setW] = useState(0);
   // rename this to tid or smthn
   const [tIdx, setTidx] = useState(null);
   const [pos, setPos] = useState({ x: 0, y: 0});
-
-
   const [textboxes, setTextboxes] = useState<TextBox[]>(props.textboxes)
   const [lines, setLines ] = useState(props.lines);
-
   const canvasRef = useRef(null);
+  const [successfulSave, setSuccessfulSave] = useState(null);
 
   useEffect(()=>{
     setH(window.innerHeight);
@@ -62,6 +66,11 @@ export default function Mindmap(props : any) {
       document.removeEventListener("mousemove", handleMousemove);
     }
   }, [textboxes, tIdx])
+  useEffect(() =>{
+
+    setSuccessfulSave(null);
+
+  }, [lines, textboxes])
 
   useEffect(()=>{
     drawLines();
@@ -79,6 +88,32 @@ export default function Mindmap(props : any) {
       ctx.stroke();
     }
   }
+  // saves the current state of the mindmap to the backend
+  const saveMindmapState = async () =>{
+    const data = { lines, textboxes};
+    try{
+      const response = await fetch(`/mindmap?mindmapID=${props.mindmapID}`, {
+        method: "POST",
+        mode: "cors", // no-cors, *cors, same-origin
+        cache: "no-cache", 
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer", 
+        body: JSON.stringify(data),
+      });
+      if(response.status == 200){
+        setSuccessfulSave(true)
+      }else{
+        setSuccessfulSave(false)
+      }
+    }catch(err){
+      setNotif(false)
+    }
+  }
+
   // update when box pos changes 
   const updateLines = (oldX: number, oldY: number, newX: number, newY: number) =>{
     const newLines = [];
@@ -119,6 +154,12 @@ export default function Mindmap(props : any) {
 
       ]
     )
+  }
+  const addTextBox = () =>{
+    setTextboxes(
+      [...textboxes, 
+        {x : 500, y: 500, text: 'NEW TEXTBOX', selected: false, id: crypto.randomUUID()}
+      ])
   }
   const connectSelectedTextboxes = () =>{
     const selected = textboxes.filter(t => t.selected);
@@ -197,16 +238,16 @@ export default function Mindmap(props : any) {
       }
     {/* menu buttons */}
     <button
-      onClick={() => {setTextboxes([...textboxes, {x : 500, y: 500, text: 'NEW TEXTBOX', selected: false}])}}
-      class="scale-115 fixed bottom-2 left-2 inline-block px-6 py-2 border-2 border-green-500 bg-green-500 text-white font-medium text-lg leading-tight uppercase rounded-full hover:bg-black hover:text-black hover:bg-opacity-5 focus:outline-none focus:ring-0 transition duration-150 ease-in-out">
-      Add 
+      onClick={addTextBox}
+      class="fixed bottom-2 left-2 inline-block px-6 py-2 border-2 border-green-500 bg-green-500 text-white font-medium leading-tight uppercase rounded-full hover:bg-black hover:text-black hover:bg-opacity-5 focus:outline-none focus:ring-0 transition duration-150 ease-in-out">
+      Add +
     </button>
     {
       textboxes.filter(t => t.selected).length === 2 
       && 
       <button
         onClick={getConnectedStatus() === 'connect'? connectSelectedTextboxes: disconnectSelectedTextboxes}
-        class="scale-115 fixed bottom-2 left-32 inline-block px-6 py-2 border-2 border-grey-700 bg-white-500 text-black font-medium text-lg leading-tight uppercase rounded-full hover:bg-black hover:text-black hover:bg-opacity-5 focus:outline-none focus:ring-0 transition duration-150 ease-in-out">
+        class="scale-115 fixed bottom-2 left-32 inline-block px-6 py-2 border-2 text-black font-medium leading-tight uppercase rounded-full hover:bg-black hover:text-black hover:bg-opacity-5 focus:outline-none focus:ring-0 transition duration-150 ease-in-out">
         { 
          getConnectedStatus()
         }
@@ -217,6 +258,15 @@ export default function Mindmap(props : any) {
     <div class='fixed top-1 right-2 scale-150'>
       <Close navigate='/'/>
     </div>
+
+    {/* Notification bar */}
+    <div class='fixed top-1 left-1'>
+      <div class='flex flex-row justify-center items-center'>
+        <button 
+          class={`border-2 border-black px-5 py-1 rounded-lg ${successfulSave === false? 'bg-red-50': (successfulSave=== true? 'bg-green-50' : 'bg-gray-50')}`}
+          onClick={saveMindmapState}>Save Changes { successfulSave !== null && ( successfulSave === true? <span>&#10003;</span> : <span>X</span> )}</button>
+        </div>
+      </div>
     </div>
   );
 }
