@@ -33,8 +33,8 @@ export default function Home({data}) {
                 </h1>
           </div>
 
-          <div class='bg-red-50 py-6'>
-            <h1 class='font-bold text-black text-4xl text-center my-3 '>GET STARTED</h1>
+          <div class='bg-red-50 py-6 flex flex-col items-center justify-center'>
+            <a class='font-bold text-black text-4xl text-center my-3 underline' href='/app/mindmaps'>GET STARTED</a>
             <p class='text-center text-lg w-1/2 mx-auto mb-2'>
               Want to know how to use MIMI? Watch our short demo: <TutorialVideo />
             </p>

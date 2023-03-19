@@ -2,7 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { setCookie} from "https://deno.land/std/http/cookie.ts";
 
 export const handler: Handlers = {
-  async POST(req) {
+  async POST(req, ctx) {
     const url = new URL(req.url);
     const form = await req.formData();
     if (form.get("username") === "deno" && form.get("password") === "land") {
@@ -17,14 +17,18 @@ export const handler: Handlers = {
         secure: true,
       });
 
-      headers.set("location", "/");
+      headers.set("location", "/app/mindmaps");
       return new Response(null, {
         status: 303, // "See Other"
         headers,
       });
     } else {
+      // redirect back to login page
+      const headers = new Headers();
+      headers.set("location", "/login?status=failed");
       return new Response(null, {
-        status: 403,
+        status: 303,
+        headers,
       });
     }
   },

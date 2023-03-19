@@ -87,7 +87,7 @@ export default function MindmapIsland(props : any) {
   const saveMindmapState = async () =>{
     const data = { lines, textboxes};
     try{
-      const response = await fetch(`/mindmap?mindmapID=${props.mindmapID}`, {
+      const response = await fetch(`/app/mindmap?mindmapID=${props.mindmapID}`, {
         method: "POST",
         mode: "cors", // no-cors, *cors, same-origin
         cache: "no-cache", 
@@ -251,7 +251,7 @@ export default function MindmapIsland(props : any) {
 
 
     <div class='fixed top-1 right-2 scale-150'>
-      <Close navigate='/'/>
+      <Close navigate='/app/mindmaps'/>
     </div>
 
     {/* Notification bar */}

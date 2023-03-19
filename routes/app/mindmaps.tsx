@@ -13,12 +13,14 @@ export const handler : Handler = {
 }
 export default function Mindmaps({data, params}){
     return(
-        <>
-        <h1>Mindmaps:</h1>
-            {
+      <div class='w-3/4 mx-auto my-0'>
+          <h1 class='text-xl font-bold mb-4 mt-3 py-3  text-center'>Mindmaps:</h1>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {
                 data.mindmaps &&
                 data.mindmaps.map(mindmap => <MindmapLinkCard title={mindmap.title} id={mindmap.mindmap_id} />)
-            }
-        </>
+          }
+        </div>
+      </div>
     )
 }
