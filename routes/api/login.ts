@@ -5,7 +5,7 @@ export const handler: Handlers = {
   async POST(req, ctx) {
     const url = new URL(req.url);
     const form = await req.formData();
-    if (form.get("username") === "deno" && form.get("password") === "land") {
+    if (form.get("username") === Deno.env.get('ADMIN_USER') && form.get("password") === Deno.env.get('ADMIN_PASS')) {
       const headers = new Headers();
       setCookie(headers, {
         name: "auth",
