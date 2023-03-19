@@ -12,8 +12,9 @@ import * as $5 from "./routes/app/mindmaps.tsx";
 import * as $6 from "./routes/index.tsx";
 import * as $7 from "./routes/login.tsx";
 import * as $$0 from "./islands/MindmapIsland.tsx";
-import * as $$1 from "./islands/Textbox.tsx";
-import * as $$2 from "./islands/TutorialVideo.tsx";
+import * as $$1 from "./islands/MindmapList.tsx";
+import * as $$2 from "./islands/Textbox.tsx";
+import * as $$3 from "./islands/TutorialVideo.tsx";
 
 const manifest = {
   routes: {
@@ -28,8 +29,9 @@ const manifest = {
   },
   islands: {
     "./islands/MindmapIsland.tsx": $$0,
-    "./islands/Textbox.tsx": $$1,
-    "./islands/TutorialVideo.tsx": $$2,
+    "./islands/MindmapList.tsx": $$1,
+    "./islands/Textbox.tsx": $$2,
+    "./islands/TutorialVideo.tsx": $$3,
   },
   baseUrl: import.meta.url,
   config,
