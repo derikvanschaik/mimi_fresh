@@ -3,18 +3,28 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import config from "./deno.json" assert { type: "json" };
-import * as $0 from "./routes/[mindmap].tsx";
+import * as $0 from "./routes/_middleware.ts";
 import * as $1 from "./routes/api/dbService.ts";
-import * as $2 from "./routes/index.tsx";
+import * as $2 from "./routes/api/login.ts";
+import * as $3 from "./routes/api/logout.ts";
+import * as $4 from "./routes/app/[mindmap].tsx";
+import * as $5 from "./routes/app/mindmaps.tsx";
+import * as $6 from "./routes/index.tsx";
+import * as $7 from "./routes/login.tsx";
 import * as $$0 from "./islands/MindmapIsland.tsx";
 import * as $$1 from "./islands/Textbox.tsx";
 import * as $$2 from "./islands/TutorialVideo.tsx";
 
 const manifest = {
   routes: {
-    "./routes/[mindmap].tsx": $0,
+    "./routes/_middleware.ts": $0,
     "./routes/api/dbService.ts": $1,
-    "./routes/index.tsx": $2,
+    "./routes/api/login.ts": $2,
+    "./routes/api/logout.ts": $3,
+    "./routes/app/[mindmap].tsx": $4,
+    "./routes/app/mindmaps.tsx": $5,
+    "./routes/index.tsx": $6,
+    "./routes/login.tsx": $7,
   },
   islands: {
     "./islands/MindmapIsland.tsx": $$0,

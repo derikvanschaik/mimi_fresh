@@ -1,9 +1,9 @@
 import { PageProps, Handler } from "$fresh/server.ts";
-import MindmapIsland from "../islands/MindmapIsland.tsx";
-import { getMindmapData, updateMindmapData } from './api/dbService.ts'
+import MindmapIsland from "../../islands/MindmapIsland.tsx";
+import { getMindmapData, updateMindmapData } from '../api/dbService.ts'
 
 export const handler : Handler = {
-  async GET(_, ctx){
+  async GET(req, ctx){
     try{
       const mindmapRows = await getMindmapData(ctx.params.mindmap);
       const [mindmapData] = mindmapRows;

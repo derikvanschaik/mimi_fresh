@@ -1,18 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import { getMindmaps } from './api/dbService.ts'
-import MindmapLinkCard from '../components/MindmapLinkCard.tsx'
 import TutorialVideo from '../islands/TutorialVideo.tsx';
-
-export const handler : Handler = {
-  async GET(_, ctx){
-    try{
-      const mindmaps = await getMindmaps();
-      return ctx.render( { mindmaps })
-    }catch(err){
-      return ctx.render( { message: 'there was an Error with server. Sorry :( '})
-    }
-  }
-}
 
 export default function Home({data}) {
   const style = {
@@ -49,25 +36,8 @@ export default function Home({data}) {
           <div class='bg-red-50 py-6'>
             <h1 class='font-bold text-black text-4xl text-center my-3 '>GET STARTED</h1>
             <p class='text-center text-lg w-1/2 mx-auto mb-2'>
-              Click any of these mindmaps below to start
-              or watch a short demo: <TutorialVideo />
+              Want to know how to use MIMI? Watch our short demo: <TutorialVideo />
             </p>
-            {/*  */}
-            <div class="w-4/5 md:w-1/2 my-0 mx-auto">
-              { data.message  && <h1>{data.message}</h1>}
-              { 
-                data.mindmaps &&
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                  { data.mindmaps.map((mindmap) =>{
-                    return (
-                      <div class='my-3'>
-                        <MindmapLinkCard title={mindmap.title} id={mindmap.mindmap_id} />
-                      </div>
-                    )
-                  })}
-                </div>
-              }              
-            </div>
           </div>
         </div>
     </>
