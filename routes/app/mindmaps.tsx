@@ -6,14 +6,22 @@ export const handler : Handler = {
     async GET(req, ctx){
       try{
         const mindmaps = await getMindmaps();
-        return ctx.render( { mindmaps })
+        return ctx.render( { mindmaps, error: false })
       }catch(err){
-        return ctx.render( { message: 'there was an Error with server. Sorry :( '})
+        return ctx.render({ error: true})
       }
     }
 }
 export default function Mindmaps({data, params}){
+    const error = data.error
     return(
-      <MindmapList mindmapList={data.mindmaps} />
+      <>
+        { !error && <MindmapList mindmapList={data.mindmaps} />}
+        { 
+          error &&
+        <h1 class='text-4xl text-center px-5 py-1 bg-red-300 rounded-md'>There was an error while loading your mindmaps. Please refresh to try again.</h1>
+        }
+      </>
+      
     )
 }
