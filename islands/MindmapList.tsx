@@ -7,7 +7,8 @@ interface MindmapProps {
 }
 enum ModalMode {
     EDIT, 
-    DELETE
+    DELETE,
+    ERROR
 }
 export default function MindmapList({ mindmapList }: MindmapProps){
     const [mindmaps, setMindmaps] = useState(mindmapList)
@@ -17,8 +18,31 @@ export default function MindmapList({ mindmapList }: MindmapProps){
     const [idx, setIdx] = useState(undefined)
     const input = useRef(undefined)
 
-    const handleNewMindmap = () =>{
-        setMindmaps([{ title: `mindmap (${mindmaps.length})`, mindmap_id: `mindmap ${mindmaps.length}`}, ...mindmaps])
+    const handleNewMindmap = async () =>{
+        try{
+            const title = `mindmap (${mindmaps.length})`
+            const response = await fetch('/app/mindmaps', {
+                method: "POST",
+                mode: "cors", // no-cors, *cors, same-origin
+                cache: "no-cache", 
+                credentials: "same-origin",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                redirect: "follow",
+                referrerPolicy: "no-referrer", 
+                body: JSON.stringify({ title }),
+            })
+            if(response.status !== 200){
+                throw new Error('Unable to save mindmap')
+            }
+            const {mindmap_id} = await response.json()
+            setMindmaps([{ title, mindmap_id}, ...mindmaps])
+        }
+        catch(err){
+            setOpenModal(true)
+            setModalMode(ModalMode.ERROR)
+        }
     }
     const handleOpenEditMindmap = (idx: number) => {
         setIdx(idx)
@@ -30,15 +54,64 @@ export default function MindmapList({ mindmapList }: MindmapProps){
         setOpenModal(true)
         setModalMode(ModalMode.DELETE)
     }
-    const handleDeleteMindmap = () =>{
-        setMindmaps(mindmaps.filter( (_, i) => i !== idx))
-        setOpenModal(false)
+    const handleDeleteMindmap = async () =>{
+        try{
+            setMindmaps(mindmaps.filter( (_, i) => i !== idx))
+            setOpenModal(false)
+
+            const { mindmap_id } = mindmaps[idx];
+            const response = await fetch('/app/mindmaps', {
+                method: "DELETE",
+                mode: "cors", // no-cors, *cors, same-origin
+                cache: "no-cache", 
+                credentials: "same-origin",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                redirect: "follow",
+                referrerPolicy: "no-referrer", 
+                body: JSON.stringify({ mindmap_id }),
+            })
+            if(response.status !== 200){
+                throw new Error('Unable to delete mindmap')
+            }
+        }
+        catch(err){
+            setOpenModal(true)
+            setModalMode(ModalMode.ERROR)
+        }
+
     }
-    const handleEditMindmap = () =>{
-        const newTitle = input.current.value;
-        const newMindmaps = [...mindmaps.slice(0, idx), {...mindmaps[idx], title: newTitle}, ...mindmaps.slice(idx + 1, mindmaps.length)]
-        setMindmaps(newMindmaps)
-        setOpenModal(false)
+    const handleEditMindmap = async () =>{
+        try{
+
+            const title = input.current.value;
+            const { mindmap_id } = mindmaps[idx]
+            const newMindmaps = [...mindmaps.slice(0, idx), {...mindmaps[idx], title }, ...mindmaps.slice(idx + 1, mindmaps.length)]
+            setMindmaps(newMindmaps)
+            setOpenModal(false)
+
+            const response = await fetch('/app/mindmaps', {
+                method: "PUT",
+                mode: "cors", // no-cors, *cors, same-origin
+                cache: "no-cache", 
+                credentials: "same-origin",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                redirect: "follow",
+                referrerPolicy: "no-referrer", 
+                body: JSON.stringify({ title ,  mindmap_id }),
+            })
+            if(response.status !== 200){
+                throw new Error('Unable to delete mindmap')
+            }
+        }
+        catch(err){
+            setOpenModal(true)
+            setModalMode(ModalMode.ERROR)
+        }
+    
     }
     return(
         <div class='w-3/4 mx-auto my-0'>
@@ -61,6 +134,13 @@ export default function MindmapList({ mindmapList }: MindmapProps){
                             <input placeholder='enter new title' ref={input}/>
                             <button onClick={handleEditMindmap} class='border-1 border-black px-5 py-1 mr-2 rounded-md'>Submit</button>
                             <button onClick={() => setOpenModal(false)} class='border-1 border-black px-5 py-1 rounded-md'>Cancel</button>
+                        </div>
+                    }
+                    { 
+                        modalMode === ModalMode.ERROR &&
+                        <div class='border-2 border-red-900 bg-red-300 px-5 py-1 rounded-lg'>
+                            There was an error trying to process your request on the server. Sorry about that!
+                            <button onClick={() => setOpenModal(false)} class='border-1 border-black px-5 py-1 rounded-md'>Close</button>
                         </div>
                     }
                 </Modal>

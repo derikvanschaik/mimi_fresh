@@ -10,7 +10,7 @@ export const handler: Handlers = {
       setCookie(headers, {
         name: "auth",
         value: "bar", // this should be a unique value for each session
-        maxAge: 120,
+        maxAge: 20 * 60, // 20 minutes 
         sameSite: "Lax", // this is important to prevent CSRF attacks
         domain: url.hostname,
         path: "/",

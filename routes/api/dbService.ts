@@ -44,10 +44,35 @@ export async function getMindmapData(mindmapID: int){
   return result.rows;
 }
 // update stringified data for mindmap
-export async function updateMindmapData(mindmapID: int, data: string){
+export async function updateMindmapData(mindmapID: number, data: string){
   // connect
   const client = await getClient();
   await client.queryObject(
     `UPDATE mindmap set mindmap_data=$1 WHERE mindmap_id=$2`, [data, mindmapID]);
+  await client.end();
+}
+
+export async function createMindmap(title: string){
+  const client = await getClient();
+  const result = await client.queryObject(
+    `insert into mindmap(mindmap_data, title) 
+    values ('', $1) returning mindmap_id`, [title]
+  )
+  await client.end();
+  return result.rows[0].mindmap_id;
+}
+
+export async function updateMindmapTitle(mindmapID: number, title: string){
+  const client = await getClient();
+  await client.queryObject(
+    `update mindmap set title=$1 where mindmap_id = $2;`, [title, mindmapID]
+  )
+  await client.end();
+}
+export async function deleteMindmap(mindmapID: number){
+  const client = await getClient();
+  await client.queryObject(
+    `delete from mindmap where mindmap_id = $1`, [mindmapID]
+  )
   await client.end();
 }
