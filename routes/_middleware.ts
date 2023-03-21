@@ -1,5 +1,7 @@
 import { MiddlewareHandlerContext } from "$fresh/server.ts";
 import { getCookies } from "https://deno.land/std/http/cookie.ts";
+import { isValidSession } from './api/dbService.ts'
+
 interface State {
   data: string;
 }
@@ -13,7 +15,8 @@ export async function handler(
     if(url.pathname.startsWith('/app')){
         // redirect user if they are not logged in
         const cookies = getCookies(req.headers);
-        if (cookies.auth !== "bar") {
+        const loggedIn = await isValidSession(cookies.auth)
+        if (!loggedIn) {
             const url = new URL(req.url);
             url.pathname = "/login";
             return Response.redirect(url);
