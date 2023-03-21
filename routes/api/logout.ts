@@ -6,7 +6,8 @@ export const handler: Handlers = {
   async GET(req) {
     const url = new URL(req.url);
     const headers = new Headers(req.headers);
-    const sessionValue = getCookies(req.headers)
+    const cookies = getCookies(req.headers)
+    const sessionValue = cookies.auth
     deleteCookie(headers, "auth", { path: "/", domain: url.hostname });
     await deleteSessionValue(sessionValue)
     headers.set("location", "/");

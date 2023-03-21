@@ -7,72 +7,96 @@ async function getClient(){
   await client.connect();
   return client;
 }
-async function createDummyMindmapData(){
-  const textboxes = [
-    { x: 600, y: 300, text: 'idea 1', id: "90192", selected: false},
-    { x: 230, y: 89, text: 'idea 2', id: "9102390", selected: false},
-    {x: 100, y: 100, text: 'another idea', id: "77", selected: false},
-  ]
-  const lines = [
-    { from: {x: 600, y: 300}, to: {x: 230, y: 89}},
-  ]
-  const mindmapData = { lines, textboxes }
-  const data = JSON.stringify(mindmapData);
-  // console.log(data)
-  const client = await getClient();
-  await client.queryObject(`UPDATE mindmap set mindmap_data=$1 WHERE mindmap_id=1`, [data])
-  await client.queryObject(`UPDATE mindmap set mindmap_data=$1 WHERE mindmap_id=2`, [data])
-  await client.queryObject(`UPDATE mindmap set mindmap_data=$1 WHERE mindmap_id=3`, [data])
-  await client.end();
-
-}
-export async function getMindmaps(){
+export async function getMindmaps(sessionValue: string){
   // connect
   const client = await getClient();
-  // query db
-  const result = await client.queryObject('SELECT * FROM mindmap');
+  // get all mindmaps by logged in user
+  // we don't want users being able to see other user's mindmaps 
+  const result = await client.queryObject(`
+  SELECT 
+    mindmap_id, mindmap_data, title 
+  FROM 
+    mindmap
+  JOIN 
+    sessions ON sessions.user_id = mindmap.user_id
+  WHERE 
+    session=$1
+  `, [sessionValue]);
   await client.end();
   return result.rows;
 }
 
-export async function getMindmapData(mindmapID: number){
+export async function getMindmapData(mindmapID: number, sessionValue: string){
   // connect
   const client = await getClient();
   // query db
-  const result = await client.queryObject('SELECT mindmap_data FROM mindmap WHERE mindmap_id=$1', [mindmapID]);
+  const result = await client.queryObject(`
+  SELECT 
+    mindmap_data 
+  FROM 
+    mindmap
+  JOIN
+    sessions on sessions.user_id = mindmap.user_id
+  WHERE 
+    mindmap_id=$1 AND session=$2`
+  , [mindmapID, sessionValue]);
   await client.end();
   return result.rows;
 }
 // update stringified data for mindmap
-export async function updateMindmapData(mindmapID: number, data: string){
+export async function updateMindmapData(mindmapID: number, data: string, sessionValue: string){
   // connect
   const client = await getClient();
-  await client.queryObject(
-    `UPDATE mindmap set mindmap_data=$1 WHERE mindmap_id=$2`, [data, mindmapID]);
+  await client.queryObject(`
+  UPDATE
+    mindmap 
+  SET 
+    data=$1
+  WHERE 
+    mindmap_id = $2
+  AND mindmap.user_id = (
+    select user_id from sessions where session = $3
+  );
+    `, [data, mindmapID, sessionValue]);
   await client.end();
 }
 
-export async function createMindmap(title: string){
+export async function createMindmap(title: string, sessionValue: string){
   const client = await getClient();
-  const result = await client.queryObject(
-    `insert into mindmap(mindmap_data, title) 
-    values ('', $1) returning mindmap_id`, [title]
+  const result = await client.queryObject(`
+    INSERT INTO mindmap(mindmap_data, title, user_id) 
+    values ('', $1, (SELECT user_id from sessions WHERE session=$2)) RETURNING mindmap_id`, [title, sessionValue]
   )
   await client.end();
   return result.rows[0].mindmap_id;
 }
 
-export async function updateMindmapTitle(mindmapID: number, title: string){
+export async function updateMindmapTitle(mindmapID: number, title: string, sessionValue: string){
   const client = await getClient();
-  await client.queryObject(
-    `update mindmap set title=$1 where mindmap_id = $2;`, [title, mindmapID]
+  await client.queryObject(`
+  UPDATE
+    mindmap 
+  SET 
+    title=$1
+  WHERE 
+    mindmap_id = $2
+  AND mindmap.user_id = (
+    select user_id from sessions where session = $3
+  );
+    `, [title, mindmapID, sessionValue]
   )
   await client.end();
 }
-export async function deleteMindmap(mindmapID: number){
+export async function deleteMindmap(mindmapID: number, sessionValue: string){
   const client = await getClient();
-  await client.queryObject(
-    `delete from mindmap where mindmap_id = $1`, [mindmapID]
+  await client.queryObject(`
+  DELETE FROM
+    mindmap
+  WHERE 
+    mindmap_id = $2
+  AND mindmap.user_id = (
+    select user_id from sessions where session = $3
+  );`, [mindmapID, sessionValue]
   )
   await client.end();
 }

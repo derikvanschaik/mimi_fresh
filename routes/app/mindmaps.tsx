@@ -1,11 +1,12 @@
-import { getMindmaps } from '../api/dbService.ts'
 import MindmapList from '../../islands/MindmapList.tsx';
-import { createMindmap, updateMindmapTitle, deleteMindmap } from '../api/dbService.ts'
+import { getCookies } from "https://deno.land/std/http/cookie.ts";
+import { getMindmaps, createMindmap, updateMindmapTitle, deleteMindmap } from '../api/dbService.ts'
 
 export const handler : Handler = {
     async GET(req, ctx){
       try{
-        const mindmaps = await getMindmaps();
+        const sessionValue = getCookies(req.headers).auth;
+        const mindmaps = await getMindmaps(sessionValue);
         return ctx.render( { mindmaps, error: false })
       }catch(err){
         return ctx.render({ error: true})
@@ -15,7 +16,8 @@ export const handler : Handler = {
     async POST(req: Request, ctx){
       try{
         const {title} = await req.json()
-        const mindmap_id = await createMindmap(title);
+        const sessionValue = getCookies(req.headers).auth;
+        const mindmap_id = await createMindmap(title, sessionValue);
         return new Response(JSON.stringify({mindmap_id}), { status: 200 })
       }catch(err){
         return new Response(null, { status: 404 })
@@ -24,7 +26,8 @@ export const handler : Handler = {
     async PUT(req, ctx){
       try{
         const {title, mindmap_id} = await req.json()
-        await updateMindmapTitle(parseInt(mindmap_id), title)
+        const sessionValue = getCookies(req.headers).auth;
+        await updateMindmapTitle(parseInt(mindmap_id), title, sessionValue)
         return new Response(null, { status: 200 })
       }catch(err){
         return new Response(null, { status: 404 })
@@ -34,7 +37,8 @@ export const handler : Handler = {
     async DELETE(req, ctx){
       try{
         const {mindmap_id} = await req.json()
-        await deleteMindmap(parseInt(mindmap_id))
+        const sessionValue = getCookies(req.headers).auth;
+        await deleteMindmap(parseInt(mindmap_id), sessionValue)
         return new Response(null, { status: 200 })
       }catch(err){
         return new Response(null, { status: 404 })

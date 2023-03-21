@@ -1,11 +1,13 @@
 import { PageProps, Handler } from "$fresh/server.ts";
 import MindmapIsland from "../../islands/MindmapIsland.tsx";
 import { getMindmapData, updateMindmapData } from '../api/dbService.ts'
+import { getCookies } from "https://deno.land/std/http/cookie.ts";
 
 export const handler : Handler = {
   async GET(req, ctx){
     try{
-      const mindmapRows = await getMindmapData(ctx.params.mindmap);
+      const sessionValue = getCookies(req.headers).auth
+      const mindmapRows = await getMindmapData(ctx.params.mindmap, sessionValue);
       const [mindmapData] = mindmapRows;
       const parsedMindmap = JSON.parse(mindmapData.mindmap_data);
       const { lines, textboxes } = parsedMindmap;
@@ -13,6 +15,7 @@ export const handler : Handler = {
       
     }catch(err){
       console.log("there was an error initializing this mindmap data.")
+      console.log(err)
       return ctx.render({ lines: [], textboxes: []});
     }
   },
@@ -33,7 +36,8 @@ export const handler : Handler = {
         requestString += decoder.decode(chunk)
       }
       const ID = parseInt(new URL(req.url).searchParams.get("mindmapID"))
-      await updateMindmapData(ID, requestString);    
+      const sessionValue = getCookies(req.headers).auth;
+      await updateMindmapData(ID, requestString, sessionValue);    
       return new Response("Successfully updated your mindmap data",{
         status: 200,
         headers: {
