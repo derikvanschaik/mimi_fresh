@@ -51,7 +51,7 @@ export async function updateMindmapData(mindmapID: number, data: string, session
   UPDATE
     mindmap 
   SET 
-    data=$1
+    mindmap_data=$1
   WHERE 
     mindmap_id = $2
   AND mindmap.user_id = (
@@ -93,9 +93,9 @@ export async function deleteMindmap(mindmapID: number, sessionValue: string){
   DELETE FROM
     mindmap
   WHERE 
-    mindmap_id = $2
+    mindmap_id = $1
   AND mindmap.user_id = (
-    select user_id from sessions where session = $3
+    select user_id from sessions where session = $2
   );`, [mindmapID, sessionValue]
   )
   await client.end();

@@ -21,23 +21,10 @@ export const handler : Handler = {
   },
   async POST(req, ctx){
     try{
-      const payload = req.body
-      if (payload === null) {
-        return new Response("Invalid body",{
-          status: 404,
-          headers: {
-            "content-type": "text/html",
-          }
-       })
-      }
-      let requestString = '';
-      const decoder = new TextDecoder()
-      for await (const chunk of payload) {
-        requestString += decoder.decode(chunk)
-      }
+      const { textboxes, lines } = await req.json();
       const ID = parseInt(new URL(req.url).searchParams.get("mindmapID"))
       const sessionValue = getCookies(req.headers).auth;
-      await updateMindmapData(ID, requestString, sessionValue);    
+      await updateMindmapData(ID, {textboxes, lines}, sessionValue);    
       return new Response("Successfully updated your mindmap data",{
         status: 200,
         headers: {
@@ -54,7 +41,6 @@ export const handler : Handler = {
     }
   }
 }
-
 
 export default function Mindmap(props: PageProps) {
   return (
