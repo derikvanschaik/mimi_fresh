@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { setCookie } from "https://deno.land/std/http/cookie.ts";
 import { isUserRegistered, createNewUser, updateUserSessionValue } from "./dbService.ts";
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.3.0/mod.ts";
+import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 
 export const handler: Handlers = {
   async POST(req, ctx) {
