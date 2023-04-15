@@ -10,8 +10,7 @@ import {
     compareSync,
   } from "https://deno.land/x/bcrypt/mod.ts";
   
-  export const isRunningInDenoDeploy = (globalThis as any).Worker === undefined; 
-console.log('is running in deploy = ', isRunningInDenoDeploy)
+export const isRunningInDenoDeploy = (globalThis as any).Worker === undefined; 
 
 export const hash: typeof hashPromise = isRunningInDenoDeploy
   ? (plaintext: string, salt: string | undefined = undefined) =>

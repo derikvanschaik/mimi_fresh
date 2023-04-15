@@ -42,7 +42,6 @@ export const handler: Handlers = {
       });
 
     }catch(err){
-      console.log("err = ", err)
       // redirect back to login page
       const headers = new Headers();
       headers.set("location", "/login?status=failed");
