@@ -44,6 +44,7 @@ export const handler: Handlers = {
       });
 
     }catch(err){
+      console.log("error = ", err)
       // redirect back to login page
       const headers = new Headers();
       headers.set("location", "/register?status=failed");
