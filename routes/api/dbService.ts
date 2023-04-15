@@ -132,3 +132,19 @@ export async function deleteSessionValue(sessionValue: string){
   await client.queryObject('delete from sessions where session=$1', [sessionValue])
   await client.end()
 }
+
+export async function isUserRegistered(name: string){
+  const client = await getClient()
+  const result = await client.queryObject('select CAST(count(*) as INT) from users where name=$1', [name]);
+  await client.end()
+  return result.rows[0].count !== 0
+}
+export async function createNewUser(name: string, password: string): Promise<number>{
+  const client = await getClient()
+  const result = await client.queryObject(`
+  INSERT INTO users(name, password)
+  VALUES ($1, $2) RETURNING user_id;
+  `, [name, password]);
+  await client.end();
+  return result.rows[0].user_id
+}

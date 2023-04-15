@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { setCookie } from "https://deno.land/std/http/cookie.ts";
-import { getUserData, updateUserSessionValue } from "./dbService.ts";
+import { isUserRegistered, createNewUser, updateUserSessionValue } from "./dbService.ts";
 import * as bcrypt from "https://deno.land/x/bcrypt@v0.3.0/mod.ts";
 
 export const handler: Handlers = {
@@ -13,14 +13,16 @@ export const handler: Handlers = {
       if(!user || !pass){
         throw new Error('Invalid fields')
       }
-      const { user_id, name, password } = await getUserData(user);
-      if(!name || !password){
-        throw new Error('user does not exist')
+      if (user.includes(' ') || pass.includes(' ')){
+          throw new Error('Invalid fields')
       }
-      const correct = await bcrypt.compare(pass, password);
-      if(!correct){
-        throw new Error('Invalid password')
+      const userExists = await isUserRegistered(user);
+      if(userExists){
+        throw new Error('username already taken')
       }
+      const salt = await bcrypt.genSalt(8);
+      const hash = await bcrypt.hash(pass, salt);
+      const user_id = await createNewUser(user, hash);
       const headers = new Headers();
       // deno bug doesn't recognize the randomUUID method. See https://github.com/denoland/deno/issues/12754
       const sessionValue = (crypto as any).randomUUID()
@@ -44,7 +46,7 @@ export const handler: Handlers = {
     }catch(err){
       // redirect back to login page
       const headers = new Headers();
-      headers.set("location", "/login?status=failed");
+      headers.set("location", "/register?status=failed");
       return new Response(null, {
         status: 303,
         headers,
