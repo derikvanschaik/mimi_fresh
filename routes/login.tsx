@@ -34,6 +34,10 @@ export default function Login({data}) {
                     </form>
                 </div>
             </div>
+            <p>
+              Don't have an account? 
+              <a class='text-blue-500 underline' href="/register">Signup</a>
+            </p>
         </div>
     </div>
     </>

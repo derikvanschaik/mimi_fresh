@@ -50,6 +50,7 @@ export default function Mindmaps({data, params}){
     const error = data.error
     return(
       <>
+        <a class='text-blue-500 underline fixed top-5 right-10' href='/api/logout'>Logout</a>
         { !error && <MindmapList mindmapList={data.mindmaps} />}
         { 
           error &&
