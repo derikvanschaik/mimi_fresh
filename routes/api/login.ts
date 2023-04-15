@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { setCookie } from "https://deno.land/std/http/cookie.ts";
 import { getUserData, updateUserSessionValue } from "./dbService.ts";
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
+import { compare } from '../../utils/decrypt.ts'
 
 export const handler: Handlers = {
   async POST(req, ctx) {
@@ -17,7 +17,7 @@ export const handler: Handlers = {
       if(!name || !password){
         throw new Error('user does not exist')
       }
-      const correct = await bcrypt.compare(pass, password);
+      const correct = await compare(pass, password);
       if(!correct){
         throw new Error('Invalid password')
       }

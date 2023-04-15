@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { setCookie } from "https://deno.land/std/http/cookie.ts";
 import { isUserRegistered, createNewUser, updateUserSessionValue } from "./dbService.ts";
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
+import { hash , genSalt } from '../../utils/decrypt.ts'
 
 export const handler: Handlers = {
   async POST(req, ctx) {
@@ -20,9 +20,9 @@ export const handler: Handlers = {
       if(userExists){
         throw new Error('username already taken')
       }
-      const salt = await bcrypt.genSalt(8);
-      const hash = await bcrypt.hash(pass, salt);
-      const user_id = await createNewUser(user, hash);
+      const salt = await genSalt(8);
+      const hashed = await hash(pass, salt);
+      const user_id = await createNewUser(user, hashed);
       const headers = new Headers();
       // deno bug doesn't recognize the randomUUID method. See https://github.com/denoland/deno/issues/12754
       const sessionValue = (crypto as any).randomUUID()
