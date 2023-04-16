@@ -105,7 +105,7 @@ export default function MindmapIsland(props : any) {
         setSuccessfulSave(false)
       }
     }catch(err){
-      setNotif(false)
+      setSuccessfulSave(false)
     }
   }
 
@@ -133,12 +133,36 @@ export default function MindmapIsland(props : any) {
     setTextboxes(textboxes.filter((_, idx: number): boolean => idx !== i ));
   }
 
-  const editTextbox = (i: number, text: string) => {
-    setTextboxes(
-      [...textboxes.slice(0, i),
-        { ...textboxes[i], text},
-      ...textboxes.slice(i+1, textboxes.length)
-      ]);
+  const editTextbox = async (i: number, text: string) => {
+    const newTextboxes = 
+    [...textboxes.slice(0, i),
+      { ...textboxes[i], text},
+    ...textboxes.slice(i+1, textboxes.length)
+    ]
+    setTextboxes(newTextboxes);
+      const data = { lines, textboxes: newTextboxes};
+      try{
+        const response = await fetch(`/app/mindmap?mindmapID=${props.mindmapID}`, {
+          method: "POST",
+          mode: "cors", // no-cors, *cors, same-origin
+          cache: "no-cache", 
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          redirect: "follow",
+          referrerPolicy: "no-referrer", 
+          body: JSON.stringify(data),
+        });
+        if(response.status == 200){
+          setSuccessfulSave(true)
+        }else{
+          setSuccessfulSave(false)
+        }
+      }catch(err){
+        setSuccessfulSave(false)
+      }
+      
   }
   const toggleSelect = (i: number) =>{
     setTextboxes(

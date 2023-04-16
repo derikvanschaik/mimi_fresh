@@ -1,5 +1,6 @@
 import { PageProps, Handler } from "$fresh/server.ts";
 import MindmapIsland from "../../islands/MindmapIsland.tsx";
+import Modal from "../../components/Modal.tsx";
 import { getMindmapData, updateMindmapData } from '../api/dbService.ts'
 import { getCookies } from "https://deno.land/std/http/cookie.ts";
 
@@ -12,11 +13,10 @@ export const handler : Handler = {
       const parsedMindmap = JSON.parse(mindmapData.mindmap_data);
       const { lines, textboxes } = parsedMindmap;
       return ctx.render({lines, textboxes})
-      
     }catch(err){
       console.log("there was an error initializing this mindmap data.")
       console.log(err)
-      return ctx.render({ lines: [], textboxes: []});
+      return ctx.render({ error: "Cannot load mindmap"});
     }
   },
   async POST(req, ctx){
@@ -24,7 +24,7 @@ export const handler : Handler = {
       const { textboxes, lines } = await req.json();
       const ID = parseInt(new URL(req.url).searchParams.get("mindmapID"))
       const sessionValue = getCookies(req.headers).auth;
-      await updateMindmapData(ID, {textboxes, lines}, sessionValue);    
+      await updateMindmapData(ID, {textboxes, lines}, sessionValue);
       return new Response("Successfully updated your mindmap data",{
         status: 200,
         headers: {
@@ -43,7 +43,15 @@ export const handler : Handler = {
 }
 
 export default function Mindmap(props: PageProps) {
+  const isError = props.data.error !== undefined
   return (
+  isError?
+  <Modal>
+    <div class='border-2 border-red-900 bg-red-300 px-5 py-1 rounded-lg'>
+      <p>{props.data.error}</p>
+      <a href='/app/mindmaps' class='underline'>Back to Mindmaps</a>
+    </div>
+  </Modal> :
   <div>
     <MindmapIsland
       mindmapID={props.params.mindmap}
