@@ -16,7 +16,7 @@ export const handler : Handler = {
     }catch(err){
       console.log("there was an error initializing this mindmap data.")
       console.log(err)
-      return ctx.render({ error: "Cannot load mindmap"});
+      return ctx.render({ error: "mindmap may have been deleted or doesn't exist. Sorry!"});
     }
   },
   async POST(req, ctx){

@@ -63,9 +63,10 @@ export async function updateMindmapData(mindmapID: number, data: string, session
 
 export async function createMindmap(title: string, sessionValue: string){
   const client = await getClient();
+  const emptyMindmapData = JSON.stringify({ textboxes: [], lines: []})
   const result = await client.queryObject(`
     INSERT INTO mindmap(mindmap_data, title, user_id) 
-    values ('', $1, (SELECT user_id from sessions WHERE session=$2)) RETURNING mindmap_id`, [title, sessionValue]
+    values ($1, $2, (SELECT user_id from sessions WHERE session=$3)) RETURNING mindmap_id`, [emptyMindmapData, title, sessionValue]
   )
   await client.end();
   return result.rows[0].mindmap_id;
