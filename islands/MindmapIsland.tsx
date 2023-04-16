@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "preact/hooks";
 import Close from "../components/Close.tsx";
 import Textbox from '../islands/Textbox.tsx';
+import Modal from '../components/Modal.tsx';
 
 
 interface TextBox {
@@ -20,6 +21,7 @@ export default function MindmapIsland(props : any) {
   const [lines, setLines ] = useState(props.lines);
   const canvasRef = useRef(null);
   const [successfulSave, setSuccessfulSave] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(()=>{
     setH(window.innerHeight);
@@ -125,12 +127,18 @@ export default function MindmapIsland(props : any) {
     }
     setLines(newLines);
   }
-  const deleteTextbox = (i: number) =>{
-    const { x, y } = textboxes[i];
-    setLines(lines.filter( line =>{
-      return ( line.from.x !== x && line.from.y !== y ) && (line.to.x !== x && line.to.y !== y);
-    }));
-    setTextboxes(textboxes.filter((_, idx: number): boolean => idx !== i ));
+  const deleteTextboxes = () =>{
+
+    const selected = textboxes.filter(t => t.selected);
+    let newLines = lines;
+    selected.forEach( textbox => {
+      const { x, y } = textbox;
+      newLines = lines.filter( line =>{
+        return ( line.from.x !== x && line.from.y !== y ) && (line.to.x !== x && line.to.y !== y);
+      })
+    })
+    setLines(newLines);
+    setTextboxes(textboxes.filter( t => !t.selected));
   }
 
   const editTextbox = async (i: number, text: string) => {
@@ -216,7 +224,11 @@ export default function MindmapIsland(props : any) {
     setTextboxes(textboxes.map( t => { return {...t, selected: false} }));
   }
   const getConnectedStatus = () =>{
+    
     const [t1, t2] = textboxes.filter(t => t.selected);
+    if (t1 === undefined || t2 === undefined) {
+      return 'connect';
+    } 
     const l = lines.filter( line => {
       if ( ( line.from.x === t1.x && line.from.y === t1.y ) && (line.to.x === t2.x && line.to.y === t2.y)){
         return true;
@@ -236,6 +248,27 @@ export default function MindmapIsland(props : any) {
 
   return (
     <div>
+      {/* delete textboxes confirmation */}
+      {
+        isDeleteModalOpen && 
+      <Modal>
+        <div>
+          <p class='px-5 py-5 bg-border-4 border-red-600 rounded bg-red-100'>
+            Confirm deletion.
+          </p>
+        </div>
+        <div class='flex flex-row justify-center'>
+          <button onClick={() =>{
+            deleteTextboxes();
+            setIsDeleteModalOpen(false);
+
+          }} class='rounded border-red-500 bg-red-100 border-2 textwhite px-5 py-2'>Delete</button>
+          <button class='ml-2 rounded border-black border-2 px-5 py-2' onClick={() => setIsDeleteModalOpen(false)}>Cancel</button>
+        </div>
+      </Modal>
+      }
+
+
       <canvas height={h} width={w} ref={canvasRef}>
       </canvas>
       {
@@ -249,29 +282,39 @@ export default function MindmapIsland(props : any) {
               text={t.text} 
               handleMousedown={() => setTidx(i)}
               handleMouseup={() => setTidx(null) }
-              handleDelete={() => deleteTextbox(i)}
               handleEdit = {(val: string) => editTextbox(i, val)}
               handleSelect={() => toggleSelect(i) }/>
           )
         })
       }
-    {/* menu buttons */}
-    <button
-      onClick={addTextBox}
-      class="fixed bottom-2 left-2 inline-block px-6 py-2 border-2 border-green-500 bg-green-500 text-white font-medium leading-tight uppercase rounded-full hover:bg-black hover:text-black hover:bg-opacity-5 focus:outline-none focus:ring-0 transition duration-150 ease-in-out">
-      Add +
-    </button>
-    {
-      textboxes.filter(t => t.selected).length === 2 
-      && 
+    {/* TEXTBOX ACTIONS (DELETE, ADD, CONNECT, DISCONNECT) */}
+    <div class='fixed bottom-2 left-2 flex flex-row'>
       <button
-        onClick={getConnectedStatus() === 'connect'? connectSelectedTextboxes: disconnectSelectedTextboxes}
-        class="scale-115 fixed bottom-2 left-32 inline-block px-6 py-2 border-2 text-black font-medium leading-tight uppercase rounded-full hover:bg-black hover:text-black hover:bg-opacity-5 focus:outline-none focus:ring-0 transition duration-150 ease-in-out">
-        { 
-         getConnectedStatus()
-        }
+        onClick={addTextBox}
+        class="inline-block px-6 py-2 border-2 border-green-500 bg-green-500 text-white font-medium leading-tight uppercase rounded-full hover:bg-black hover:text-black hover:bg-opacity-5 focus:outline-none focus:ring-0 transition duration-150 ease-in-out">
+        Add +
       </button>
-    }
+
+      {
+        <button
+          disabled={ textboxes.filter(t => t.selected).length !== 2 }
+          onClick={getConnectedStatus() === 'connect'? connectSelectedTextboxes: disconnectSelectedTextboxes}
+          className={`${textboxes.filter(t => t.selected).length !== 2 ? 'cursor-not-allowed bg-gray-300 text-muted text-white' : 'bg-gray-400 text-black'} px-5 py-2 rounded`}>
+          { 
+          getConnectedStatus()
+          }
+        </button>
+      }
+      
+      {  
+        <button
+          disabled={textboxes.filter(t => t.selected).length === 0}
+          className={`${textboxes.filter(t => t.selected).length === 0? 'cursor-not-allowed bg-red-100 text-muted' : 'bg-red-500'} text-white px-5 py-2 rounded`} 
+          onClick={() => setIsDeleteModalOpen(true)}>
+          DELETE
+        </button>
+      }
+    </div>
 
 
     <div class='fixed top-1 right-2 scale-150'>

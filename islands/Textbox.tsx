@@ -1,6 +1,5 @@
-import { useState, useEffect } from "preact/hooks";
-import EditText from "../components/EditText.tsx";
-import More from '../components/More.tsx';
+import { useState, useEffect, useRef } from "preact/hooks";
+import Edit from '../components/Edit.tsx';
 
 interface TextboxProps{
     x: number,
@@ -17,62 +16,76 @@ export default function Textbox(
   {x, y, text, selected, handleMousedown, handleMouseup, handleDelete, handleEdit, handleSelect}: TextboxProps) 
   {
   const [hover, setHover] = useState(false);
-  const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
-
+  const editableRef = useRef(null);
+  
   return (
     <div
-        onMousedown={handleMousedown}
-        onMouseup={handleMouseup}
+        onMousedown={() => {
+          if (editing){
+            return;
+          }
+          handleMousedown()
+        }}
+        onMouseup={() =>{
+          if (editing){
+            return;
+          }
+          handleMouseup()
+        }}
         onMouseenter={() => setHover(true)}
         onMouseleave={() => setHover(false)}
-        className={`fixed top-[${y}px] left-[${x}px] border-${selected? '4' : '2'} border-${selected? 'indigo': 'grey'}-500 max-w-[250px] scale-110 shadow-md rounded-lg px-4 py-3 select-none transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-125 cursor-move bg-white`}>
-      { editing && 
-          <EditText 
-            value={text} 
-            handleSubmit={(val: string) => {
-              setEditing(false);
-              handleEdit(val);
-            }}
-            handleCancel={() => setEditing(false)}/> 
-      }
-      { !editing && text} 
-    {/* More action menu icon */}
+        className={`fixed top-[${y}px] left-[${x}px] border-2 border-grey-500 max-w-[250px] min-w-[200px] min-h-[35px] break-all scale-110 shadow-md rounded-lg px-4 py-3 select-none transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-125 ${!editing? 'cursor-move': ''} bg-white`}
+        contenteditable={editing? 'true' : 'false'}
+        // this event is necessary for when text is blank
+        onKeydown={(e) => {
+          // this is a hack so that user can input into a blank textbox as expected
+          if(e.key.length === 1 && editableRef.current.textContent === ''){
+            editableRef.current.textContent = ''
+          }
+        }}
+        ref={editableRef}
+        onBlur={() => {
+          setEditing(false);
+          handleEdit(editableRef.current.textContent);
+          editableRef.current.textContent = '';
+        }}>
+          {text}
     <div
-      onClick={() => setOpen(!open)}
-      className={`absolute -top-1 -right-1 ${hover? 'visible': 'invisible'} cursor-pointer`}>
-        <More />
+      onClick={() =>{
+        if (!editableRef){
+          return;
+        }
+        setEditing(!editing);
+        const willBeEditing = !editing;
+        if(willBeEditing){
+          // dumb hack needed for focus to work
+          setTimeout(()=>{
+            editableRef.current.focus();
+          }, 0)
+        }
+      }}
+      className={`absolute -top-1 -right-1 ${hover && !editing? 'visible': 'invisible'} cursor-pointer`}>
+          <Edit/>
     </div>
-
-    {/* action menu */}
-    <div className={`absolute z-11 ${!open? 'hidden' : ''} bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 cursor-pointer`}>
-        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownHoverButton">
-          <li onClick={handleDelete}>
-            <p
-              class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" >
-              Delete
-            </p>
-          </li>
-          <li onClick={() => {
-            setEditing(true);
-            setOpen(false);
-            
-          }}>
-            <p 
-              class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" >
-              Edit
-            </p>
-          </li>
-          <li onClick={() =>{
-            handleSelect();
-            setOpen(false);
-          }}>
-            <p 
-              class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" >
-              Toggle Select
-            </p>
-          </li>
-        </ul>
+    <div className={`absolute -top-1 -left-1 ${ (hover || selected) ? 'visible' : 'invisible' } cursor-pointer`}>
+      {
+        selected? 
+        <input 
+          checked 
+          type="checkbox" 
+          value="" 
+          class="w-4 h-4 bg-gray-100 border-gray-300 rounded focus:ring-2" 
+          onChange={ handleSelect }/> 
+        :
+        <input 
+          type="checkbox" 
+          value="" 
+          class="w-4 h-4 bg-gray-100 border-gray-300 rounded focus:ring-2" 
+          onChange={ handleSelect }
+        />
+      }
+      
     </div>
     </div>
 
