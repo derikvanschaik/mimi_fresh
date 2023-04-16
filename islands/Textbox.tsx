@@ -15,6 +15,8 @@ interface TextboxProps{
 export default function Textbox(
   {x, y, text, selected, handleMousedown, handleMouseup, handleDelete, handleEdit, handleSelect}: TextboxProps) 
   {
+  // need this curText state variable or else bug will occur in the textcontent editable stuff
+  const [curText, _] = useState(text);
   const [hover, setHover] = useState(false);
   const [editing, setEditing] = useState(false);
   const editableRef = useRef(null);
@@ -35,22 +37,17 @@ export default function Textbox(
         }}
         onMouseenter={() => setHover(true)}
         onMouseleave={() => setHover(false)}
-        className={`fixed top-[${y}px] left-[${x}px] border-2 border-grey-500 max-w-[250px] min-w-[200px] min-h-[35px] break-all scale-110 shadow-md rounded-lg px-4 py-3 select-none transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-125 ${!editing? 'cursor-move': ''} bg-white`}
-        contenteditable={editing? 'true' : 'false'}
-        // this event is necessary for when text is blank
-        onKeydown={(e) => {
-          // this is a hack so that user can input into a blank textbox as expected
-          if(e.key.length === 1 && editableRef.current.textContent === ''){
-            editableRef.current.textContent = ''
-          }
-        }}
-        ref={editableRef}
-        onBlur={() => {
-          setEditing(false);
-          handleEdit(editableRef.current.textContent);
-          editableRef.current.textContent = '';
-        }}>
-          {text}
+        className={`fixed top-[${y}px] left-[${x}px] border-2 border-grey-500 max-w-[250px] min-w-[200px] min-h-[35px] break-word scale-110 shadow-md rounded-lg px-4 py-3 select-none transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-125 ${!editing? 'cursor-move': ''} bg-white`}
+        >
+          <p
+            contenteditable={editing? 'true' : 'false'}
+            ref={editableRef}
+            onBlur={(e) => {
+              setEditing(false);
+              handleEdit(editableRef.current.textContent);
+            }}>
+              {curText}
+          </p>
     <div
       onClick={() =>{
         if (!editableRef){
