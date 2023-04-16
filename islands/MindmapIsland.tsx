@@ -133,15 +133,17 @@ export default function MindmapIsland(props : any) {
     let newLines = lines;
     selected.forEach( textbox => {
       const { x, y } = textbox;
-      newLines = lines.filter( line =>{
-        return ( line.from.x !== x && line.from.y !== y ) && (line.to.x !== x && line.to.y !== y);
+      newLines = newLines.filter( line =>{
+        const willBeKept = ( line.from.x !== x && line.from.y !== y ) && (line.to.x !== x && line.to.y !== y);
+        return willBeKept;
       })
     })
-    setLines(newLines);
     setTextboxes(textboxes.filter( t => !t.selected));
+    setLines(newLines);
   }
 
   const editTextbox = async (i: number, text: string) => {
+    console.log('textbox = ', text)
     const newTextboxes = 
     [...textboxes.slice(0, i),
       { ...textboxes[i], text},
@@ -183,10 +185,12 @@ export default function MindmapIsland(props : any) {
     )
   }
   const addTextBox = () =>{
+    const newTextBox = {x : 500, y: 500, text: 'NEW TEXTBOX', selected: false, id: crypto.randomUUID()}
     setTextboxes(
       [...textboxes, 
-        {x : 500, y: 500, text: 'NEW TEXTBOX', selected: false, id: crypto.randomUUID()}
+        newTextBox
       ])
+
   }
   const connectSelectedTextboxes = () =>{
     const selected = textboxes.filter(t => t.selected);
