@@ -11,14 +11,14 @@ interface TextBox {
 }
 
 export default function MindmapIsland(props : any) {
-
+  const { isDemo } = props;
   const [h, setH] = useState(0);
   const [w, setW] = useState(0);
   // rename this to tid or smthn
   const [tIdx, setTidx] = useState(null);
   const [pos, setPos] = useState({ x: 0, y: 0});
-  const [textboxes, setTextboxes] = useState<TextBox[]>(props.textboxes)
-  const [lines, setLines ] = useState(props.lines);
+  const [textboxes, setTextboxes] = useState<TextBox[]>(props.textboxes || [])
+  const [lines, setLines ] = useState(props.lines || []);
   const canvasRef = useRef(null);
   const [successfulSave, setSuccessfulSave] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -88,6 +88,9 @@ export default function MindmapIsland(props : any) {
   // saves the current state of the mindmap to the backend
   const saveMindmapState = async () =>{
     const data = { lines, textboxes};
+    if(isDemo){
+      return;
+    }
     try{
       const response = await fetch(`/app/mindmap?mindmapID=${props.mindmapID}`, {
         method: "POST",
@@ -98,7 +101,7 @@ export default function MindmapIsland(props : any) {
           "Content-Type": "application/json",
         },
         redirect: "follow",
-        referrerPolicy: "no-referrer", 
+        referrerPolicy: "no-referrer",
         body: JSON.stringify(data),
       });
       if(response.status == 200){
@@ -151,6 +154,9 @@ export default function MindmapIsland(props : any) {
     ]
     setTextboxes(newTextboxes);
       const data = { lines, textboxes: newTextboxes};
+      if(isDemo){
+        return;
+      }
       try{
         const response = await fetch(`/app/mindmap?mindmapID=${props.mindmapID}`, {
           method: "POST",
