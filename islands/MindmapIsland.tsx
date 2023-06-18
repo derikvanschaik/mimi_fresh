@@ -2,8 +2,6 @@ import { useState, useEffect, useRef } from "preact/hooks";
 import Close from "../components/Close.tsx";
 import Textbox from '../islands/Textbox.tsx';
 import Modal from '../components/Modal.tsx';
-// import Overlay from "../components/Overlay.tsx";
-import TourInstruction from "./TourInstruction.tsx";
 
 
 interface TextBox {
@@ -13,6 +11,7 @@ interface TextBox {
 }
 
 export default function MindmapIsland(props : any) {
+  const { isDemo } = props;
   const [h, setH] = useState(0);
   const [w, setW] = useState(0);
   // rename this to tid or smthn
@@ -23,10 +22,6 @@ export default function MindmapIsland(props : any) {
   const canvasRef = useRef(null);
   const [successfulSave, setSuccessfulSave] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const { isDemo } = props;
-  const [isDemoModalOpen, setIsDemoModalOpen ] = useState(isDemo);
-  const [tourIdx , setTourIdx ] = useState(-1);
-  const [showTourInstruction, setShowTourInstruction] = useState(false);
 
   useEffect(()=>{
     setH(window.innerHeight);
@@ -201,13 +196,6 @@ export default function MindmapIsland(props : any) {
       [...textboxes, 
         newTextBox
       ])
-    if(!isDemo){
-      return;
-    }
-    if(tourIdx === 0){
-      setShowTourInstruction(true);
-      setTourIdx(1)
-    }
 
   }
   const connectSelectedTextboxes = () =>{
@@ -289,30 +277,6 @@ export default function MindmapIsland(props : any) {
         </div>
       </Modal>
       }
-      {
-        isDemoModalOpen && 
-        <Modal>
-          <p>
-            Welcome to MIMI. This is a demo to try out the application without having to sign up for the service.
-            If you are already a user, head to the <a class='text-blue-500 underline' href='/login'>Login</a>.
-          </p>
-          <button 
-            class='ml-2 rounded border-black border-2 px-5 py-2' 
-            onClick={() => setIsDemoModalOpen(false)}>Dismiss</button>
-          <button 
-            class='ml-2 rounded border-black border-2 px-5 py-2' 
-            onClick={() => {
-              setIsDemoModalOpen(false);
-              setTourIdx(0);
-              setShowTourInstruction(true);
-            }}>Take Quick tour</button>
-        </Modal>
-      }
-      {/* interactive tour instruction element */}
-      {
-        showTourInstruction &&
-        <TourInstruction tourIdx={tourIdx} height={h} handleSubmitTourStep={() => setShowTourInstruction(false)} />
-      }
 
 
       <canvas height={h} width={w} ref={canvasRef}>
@@ -335,7 +299,6 @@ export default function MindmapIsland(props : any) {
       }
     {/* TEXTBOX ACTIONS (DELETE, ADD, CONNECT, DISCONNECT) */}
     <div class='fixed bottom-2 left-2 flex flex-row'>
-
       <button
         onClick={addTextBox}
         class="inline-block px-6 py-2 border-2 border-green-500 bg-green-500 text-white font-medium leading-tight uppercase rounded-full hover:bg-black hover:text-black hover:bg-opacity-5 focus:outline-none focus:ring-0 transition duration-150 ease-in-out">
