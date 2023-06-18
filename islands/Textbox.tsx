@@ -20,6 +20,11 @@ export default function Textbox(
   const [hover, setHover] = useState(false);
   const [editing, setEditing] = useState(false);
   const editableRef = useRef(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() =>{
+    setIsMounted(true);
+  }, []);
   
   return (
     <div
@@ -37,7 +42,7 @@ export default function Textbox(
         }}
         onMouseenter={() => setHover(true)}
         onMouseleave={() => setHover(false)}
-        className={`fixed top-[${y}px] left-[${x}px] border-2 border-grey-500 max-w-[250px] min-w-[200px] min-h-[35px] break-word scale-110 shadow-md rounded-lg px-4 py-3 select-none transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-125 ${!editing? 'cursor-move': ''} bg-white`}
+        className={`fixed top-[${y}px] left-[${x}px] border-2 border-grey-500 max-w-[250px] min-w-[200px] min-h-[35px] break-word shadow-md rounded-lg px-4 py-3 select-none transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-125 ${!editing? 'cursor-move': ''} bg-white ${isMounted?  'scale-110' : 'scale-0'}`}
         >
           <p
             contenteditable={editing? 'true' : 'false'}
