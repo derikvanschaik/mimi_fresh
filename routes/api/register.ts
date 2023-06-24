@@ -9,6 +9,7 @@ export const handler: Handlers = {
     const form = await req.formData();
     const user = form.get('username')
     const pass = form.get('password')
+    
     try{
       if(!user || !pass){
         throw new Error('Invalid fields')
