@@ -15,7 +15,7 @@ import * as $8 from "./routes/login.tsx";
 import * as $9 from "./routes/register.tsx";
 import * as $$0 from "./islands/MindmapIsland.tsx";
 import * as $$1 from "./islands/MindmapList.tsx";
-import * as $$2 from "./islands/PasswordsMatch.tsx";
+import * as $$2 from "./islands/PasswordChooser.tsx";
 import * as $$3 from "./islands/Textbox.tsx";
 import * as $$4 from "./islands/TourInstruction.tsx";
 import * as $$5 from "./islands/TutorialVideo.tsx";
@@ -36,7 +36,7 @@ const manifest = {
   islands: {
     "./islands/MindmapIsland.tsx": $$0,
     "./islands/MindmapList.tsx": $$1,
-    "./islands/PasswordsMatch.tsx": $$2,
+    "./islands/PasswordChooser.tsx": $$2,
     "./islands/Textbox.tsx": $$3,
     "./islands/TourInstruction.tsx": $$4,
     "./islands/TutorialVideo.tsx": $$5,
