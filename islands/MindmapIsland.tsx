@@ -196,7 +196,7 @@ export default function MindmapIsland(props : any) {
     )
   }
   const addTextBox = () =>{
-    const newTextBox = {x : 500, y: 500, text: 'NEW TEXTBOX', selected: false, id: crypto.randomUUID()}
+    const newTextBox = {x : 500, y: 500, text: '', selected: false, id: crypto.randomUUID()}
     setTextboxes(
       [...textboxes, 
         newTextBox

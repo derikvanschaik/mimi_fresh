@@ -18,12 +18,15 @@ export default function Textbox(
   // need this curText state variable or else bug will occur in the textcontent editable stuff
   const [curText, _] = useState(text);
   const [hover, setHover] = useState(false);
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(true);
   const editableRef = useRef(null);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() =>{
     setIsMounted(true);
+    if(editableRef && editableRef.current){
+      editableRef.current.focus();
+    }
   }, []);
   
   return (
@@ -45,6 +48,8 @@ export default function Textbox(
         className={`fixed top-[${y}px] left-[${x}px] border-2 border-grey-500 max-w-[250px] min-w-[200px] min-h-[35px] break-word shadow-md rounded-lg px-4 py-3 select-none transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-125 ${!editing? 'cursor-move': ''} bg-white ${isMounted?  'scale-110' : 'scale-0'}`}
         >
           <p
+            // only want padding when editing to see cursor
+            className={editing?  'px-2 py-3': ''}
             contenteditable={editing? 'true' : 'false'}
             ref={editableRef}
             onBlur={(e) => {
