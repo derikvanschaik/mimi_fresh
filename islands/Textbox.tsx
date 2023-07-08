@@ -45,7 +45,7 @@ export default function Textbox(
         }}
         onMouseenter={() => setHover(true)}
         onMouseleave={() => setHover(false)}
-        className={`fixed top-[${y}px] left-[${x}px] border-2 border-grey-500 max-w-[250px] min-w-[200px] min-h-[35px] break-word shadow-md rounded-lg px-4 py-3 select-none transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-125 ${!editing? 'cursor-move': ''} bg-white ${isMounted?  'scale-110' : 'scale-0'}`}
+        className={`fixed top-[${y}px] left-[${x}px] border-2 border-grey-500 max-w-[250px] min-w-[200px] min-h-[35px] break-all shadow-md rounded-lg px-4 py-3 select-none transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-125 ${!editing? 'cursor-move': ''} bg-white ${isMounted?  'scale-110' : 'scale-0'}`}
         >
           <p
             // only want padding when editing to see cursor
