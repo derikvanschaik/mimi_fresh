@@ -342,27 +342,27 @@ export default function MindmapIsland(props : any) {
         Add +
       </button>
 
-      {
+    </div>
+    {/* CONNECT BUTTON */}
+    {
         <button
-          disabled={ textboxes.filter(t => t.selected).length !== 2 }
           onClick={getConnectedStatus() === 'connect'? connectSelectedTextboxes: disconnectSelectedTextboxes}
-          className={`${textboxes.filter(t => t.selected).length !== 2 ? 'cursor-not-allowed bg-gray-300 text-muted text-white' : 'bg-gray-400 text-black'} px-5 py-2 rounded`}>
+            className={`fixed left-1/3 bottom-1/3 text-xl scale-150 px-5 py-2 rounded bg-gray-200 transition transform ease duration-500
+          ${textboxes.filter(t => t.selected).length !== 2? 'translate-y-[1000px]' : '' }`}>
           { 
           getConnectedStatus()
           }
         </button>
       }
-      
-      {  
+    {/* DELETE BUTTON */}
+    {  
         <button
-          disabled={textboxes.filter(t => t.selected).length === 0}
-          className={`${textboxes.filter(t => t.selected).length === 0? 'cursor-not-allowed bg-red-100 text-muted' : 'bg-red-500'} text-white px-5 py-2 rounded`} 
+          className={`fixed right-1/3 bottom-1/3 text-xl scale-150 px-5 py-2 rounded bg-gray-200 transition transform ease duration-500
+            ${textboxes.filter(t => t.selected).length === 0? 'translate-y-[1000px]' : '' }`}
           onClick={() => setIsDeleteModalOpen(true)}>
-          DELETE
+          delete
         </button>
       }
-    </div>
-
 
     <div class='fixed top-1 right-2 scale-150'>
       <Close navigate='/app/mindmaps'/>
